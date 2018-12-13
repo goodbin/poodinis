@@ -12,7 +12,9 @@
 module poodinis.factory;
 
 import poodinis.container;
+import poodinis.autowire : Autowire;
 
+import std.meta : anySatisfy;
 import std.typecons;
 import std.exception;
 import std.traits;
@@ -123,10 +125,22 @@ class ConstructorInjectingInstanceFactory(InstanceType) : InstanceFactory {
         enforce!InstanceCreationException(container, "A dependency container is not defined. Cannot perform constructor injection without one.");
         enforce!InstanceCreationException(!isBeingInjected, format("%s is already being created and injected; possible circular dependencies in constructors?", InstanceType.stringof));
 
+        template IsCtorAutowired(alias ctor)
+        {
+            template IsAutowireAttribute(alias A)
+            {
+                enum IsAutowireAttribute = is(A == Autowire!T, T) || 
+                        __traits(isSame, A, Autowire);
+            }
+
+            enum IsCtorAutowired = anySatisfy!(IsAutowireAttribute, 
+                    __traits(getAttributes, ctor));
+        }
+
         Object instance = null;
         static if (__traits(compiles, __traits(getOverloads, InstanceType, `__ctor`))) {
             foreach(ctor ; __traits(getOverloads, InstanceType, `__ctor`)) {
-                static if (parametersAreValid!(Parameters!ctor)) {
+                static if (parametersAreValid!(Parameters!ctor) && IsCtorAutowired!ctor) {
                     isBeingInjected = true;
 
                     alias Params = Parameters!ctor;

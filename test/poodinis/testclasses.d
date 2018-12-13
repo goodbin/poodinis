@@ -219,6 +219,7 @@ version(unittest) {
 
         public Red red;
 
+        @Autowire
         this(Red red) {
             this.red = red;
         }
@@ -227,6 +228,7 @@ version(unittest) {
     class Wallpaper {
         public Color color;
 
+        @Autowire
         this(Color color) {
             this.color = color;
         }
@@ -253,6 +255,7 @@ version(unittest) {
     }
 
     class Hello {
+        @Autowire
         this(Ola ola) {}
     }
 
@@ -457,6 +460,7 @@ version(unittest) {
     class ClassWithConstructor {
         public TestImplementation testImplementation;
 
+        @Autowire
         this(TestImplementation testImplementation) {
             this.testImplementation = testImplementation;
         }
@@ -466,6 +470,7 @@ version(unittest) {
         public SomeOtherClassThen someOtherClassThen;
         public TestImplementation testImplementation;
 
+        @Autowire
         this(SomeOtherClassThen someOtherClassThen) {
             this.someOtherClassThen = someOtherClassThen;
         }
@@ -480,6 +485,7 @@ version(unittest) {
         public SomeOtherClassThen someOtherClassThen;
         public TestImplementation testImplementation;
 
+        @Autowire
         this(SomeOtherClassThen someOtherClassThen, TestImplementation testImplementation) {
             this.someOtherClassThen = someOtherClassThen;
             this.testImplementation = testImplementation;
@@ -492,6 +498,7 @@ version(unittest) {
         this(string willNotBePicked) {
         }
 
+        @Autowire
         this(SomeOtherClassThen someOtherClassThen) {
             this.someOtherClassThen = someOtherClassThen;
         }
@@ -519,6 +526,7 @@ version(unittest) {
         this(Thing willNotBePicked) {
         }
 
+        @Autowire
         this(SomeOtherClassThen someOtherClassThen) {
             this.someOtherClassThen = someOtherClassThen;
         }
