@@ -111,11 +111,18 @@ class ConstructorInjectingInstanceFactory(InstanceType) : InstanceFactory {
 
     private static bool parametersAreValid(Params...)() {
         bool isValid = true;
-        foreach(param; Params) {
-            if (isBuiltinType!param || is(param == struct)) {
-                isValid = false;
+
+        enum parameterAreValid(P) = !(isBuiltinType!P || is(P == struct));
+
+        foreach(param; Params) 
+        { 
+            static if (isArray!param)
+                isValid = parameterAreValid!(ForeachType!param);
+            else
+                isValid = parameterAreValid!param;
+
+            if (!isValid)
                 break;
-            }
         }
 
         return isValid;
@@ -140,13 +147,17 @@ class ConstructorInjectingInstanceFactory(InstanceType) : InstanceFactory {
         Object instance = null;
         static if (__traits(compiles, __traits(getOverloads, InstanceType, `__ctor`))) {
             foreach(ctor ; __traits(getOverloads, InstanceType, `__ctor`)) {
-                static if (parametersAreValid!(Parameters!ctor) && IsCtorAutowired!ctor) {
+                alias Params = Parameters!ctor;
+
+                static if (parametersAreValid!(Params) && IsCtorAutowired!ctor) {
                     isBeingInjected = true;
 
-                    alias Params = Parameters!ctor;
                     Params params = void;
                     foreach(i, param; Params) {
-                        params[i] = container.resolve!param;
+                        static if (isArray!param)
+                            params[i] = container.resolveAll!(ForeachType!param);
+                        else
+                            params[i] = container.resolve!param;
                     }
                     instance = new InstanceType(params);
 
@@ -165,3 +176,4 @@ class ConstructorInjectingInstanceFactory(InstanceType) : InstanceFactory {
         return instance;
     }
 }
+
